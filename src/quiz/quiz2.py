@@ -4,7 +4,7 @@ transitions = {
     'state': 'start',
     '`Hello, how can I help you?`': {
 
-        '[{haircut, haircutting}]':{
+        '[{haircut, haircutting,cut}]':{
             '`Sure. What date and time are you looking for?`':{
                 '[monday, <10>, am]':{
                      '`Your appointment is set. See you!`':'end'
@@ -24,7 +24,7 @@ transitions = {
             }
         },
 
-        '[{hair coloring, coloring}]':{
+        '[{hair coloring, coloring,color}]':{
             '`Sure. What date and time are you looking for?`':{
                 '[wednesday,<10>, am]':{
                     '`Your appointment is set. See you!`':'end'
@@ -47,7 +47,7 @@ transitions = {
             }
                 },
 
-        '[{hair perming, perming}]':{
+        '[{hair perming, perming,perm}]':{
             '`Sure. What date and time are you looking for?`':{
                 '[friday, <10>, am]':{
                     '`Your appointment is set. See you!`':'end'

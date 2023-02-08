@@ -5,18 +5,14 @@ transitions = {
     '`Hello. How are you?`': {
         '[{good, fantastic}]': {
             '`Glad to hear that you are doing well :)`': {
-                'error': {
-                    '`See you later!`': 'end'
+                '[{how, and}, {you, going}]': {
+                    '`I feel superb. Thank you!`': 'end'
                 }
             }
         },
         'error': {
-            '`I hope your day gets better soon :(`': {
-                'error': {
-                    '`Take care!`': 'end'
-                }
-            }
-        }
+            '`Got it; thanks for sharing.`': 'end'
+        },
     }
 }
 

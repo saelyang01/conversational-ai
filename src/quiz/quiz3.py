@@ -66,7 +66,7 @@ transitions = {
                     '[#ONT(disney)]': {
                         '`I love Disney! Who is your favorite princess？`': {
                             '[$FAVORITE_PRINCESS=#ONT(princess)]': {
-                                '`she is truly the best princess I\'ve never seen.So do you love cartoon movies?`': {
+                                '`I love `$FAVORITE_PRINCESS`!she is truly the best princess I\'ve never seen.So do you love cartoon movies?`': {
                                     '[{yes,correct,right,of course}]': {
                                         '`Great! same for me. Can you tell me why the cartoons are so attractive?`': {
                                             'error': {

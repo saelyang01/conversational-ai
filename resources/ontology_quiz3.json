@@ -26,7 +26,17 @@
     "cartoons":["the lion king","shrek","finding nemo","toy story", "the incredibles", "monsters", "ratatouille", "up",
     "walle", "inside out", "beauty and the beast","aladdin", "the little mermaid","mulan", "frozen", "moana",
       "the spongebob squarepants movie", "the simpsons movie", "the secret life of pets", "zootopia","kung fu panda",
-      "how to train your dragon", "despicable me", "tangled the prince of egypt"]
+      "how to train your dragon", "despicable me", "tangled the prince of egypt"],
+    "romance": ["the notebook", "titanic", "pretty woman", "the fault in our stars", "a walk to remember", "the twilight saga",
+    "the vow", "me before you", "love actually", "the time traveler's wife", "the lucky one", "the best of me", "safe haven",
+    "the last song", "dear john", "crazy rich asians", "la la land", "dirty dancing", "sleepless in seattle", "when harry met sally",
+    "notting hill", "the holiday", "serendipity", "the phantom of the opera", "ghost", "the english patient", "out of africa",
+    "the bridges of madison county", "moulin rouge", "the shape of water"],
+    "horror": ["the exorcist", "the shining", "psycho", "halloween", "a nightmare on elm street", "the texas chainsaw massacre",
+    "friday the 13th", "scream", "the conjuring", "insidious", "the babadook", "the blair witch project", "the ring",
+    "the grudge", "the silence of the lambs", "saw", "paranormal activity", "it", "hereditary", "midsommar", "get out",
+    "us", "the witch", "sinister", "annabelle", "the omen", "carrie", "rosemary's baby", "don't look now", "suspiria"]
+
 
   }
 

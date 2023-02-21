@@ -40,13 +40,23 @@ transitions = {
                         '`I love Marvels! Who is your favorite avenger?`': {
                             '[$FAVORITE_AVENGER=#ONT(avengers)]': {
                                 '`I\'m addicted to `$FAVORITE_AVENGER` too. So I guess you are a big fan of Sci-Fi Movies?`': {
-                                    '[{yes,correct,right,of course}]': {
+                                    '[{yes,correct,right,of course,i am,exactly yes}]': {
                                         '`Excellent,what\'s the reason you like them so much?`': {
                                             'error': {
-                                                '`I got the same feelings too. Thanks for sharing!`': 'end'}
+                                                '`I got the same feelings too. Any other recommendations for other Sci-Fi Movies?`':{
+                                                    '[$RECOMMEND_MOVIE=#ONT(sci-fi)]':{
+                                                        '`I enjoyed watching `$RECOMMEND_MOVIE` too. Thanks for sharing!`':'end'
+
+                                                    },
+                                                    'error': {
+                                                        '`Sorry, I didn\'t understand you.`': 'end'
+                                                    }
+                                                }
+
+                                            }
                                         }
                                     },
-                                    '[{no, incorrect,not right, not exactly}]': {
+                                    '[{no, incorrect,not right, not exactly,certainly not}]': {
                                          '`Oh fine, I guess you must have other preferences!`': {
                                             'error': {
                                                 '`Anyway, thank you so much for sharing!`': 'end'
@@ -64,17 +74,17 @@ transitions = {
                         }
                     },
                     '[#ONT(disney)]': {
-                        '`I love Disney! Who is your favorite princess？`': {
+                        '`I love disney movies! Who is your favorite princess？`': {
                             '[$FAVORITE_PRINCESS=#ONT(princess)]': {
-                                '`I love `$FAVORITE_PRINCESS`!she is truly the best princess I\'ve never seen.So do you love cartoon movies?`': {
-                                    '[{yes,correct,right,of course}]': {
+                                '`I love `$FAVORITE_PRINCESS`!she is truly the best princess i\'ve never seen.So do you love cartoon movies?`': {
+                                    '[{yes,correct,right,of course,i am,exactly yes}]': {
                                         '`Great! same for me. Can you tell me why the cartoons are so attractive?`': {
                                             'error': {
                                                 '`Totally agree. Thanks for sharing!`': 'end'
                                             }
                                         }
                                     },
-                                    '[{no,incorrect,not right,not exactly}]': {
+                                    '[{no,incorrect,not right,not exactly,certainly not}]': {
                                         '`Oh fine, I guess you must have other preferences!`': {
                                             'error': {
                                                 '`Anyway, thank you so much for sharing!`': 'end'
@@ -93,6 +103,34 @@ transitions = {
                         'error': {
                             '`Sorry, I didn\'t understand you.`': 'end'
                         }
+                    },
+                    '[#ONT(romance)]':{
+                        '`Wow! Do you love romance movies? `':{
+                            '[{yes,correct,right,of course,i am,exactly yes}]': {
+                                '`Great! why the romance movies attract you?`':{
+                                    'error':{
+                                        '`Glad to hear that! Thanks for sharing`':'end'
+                                    }
+                                }
+                            },
+                            '[{no, incorrect,not right, not exactly,certainly not}]': {
+                                '`Oh fine, I guess you must have other preferences!`': {
+                                            'error': {
+                                                '`Anyway, thank you so much for sharing!`': 'end'
+                                            }
+                                         }
+
+                            }
+
+                            }
+                    },
+                    '[$LATEST_MOVIES=#ONT(horror)]':{
+                        '`Do you mean `$LATEST_MOVIES`? It\'s amazing that you watch horror movies, why?`':{
+                            'error':{
+                                '`I see, thanks for sharinng!`':'end'
+                            }
+                        }
+
                     },
                     'error': {
                         '`Sorry, I didn\'t understand you.`': 'end'

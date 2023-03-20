@@ -37,19 +37,42 @@ class MacroTime(Macro):
 
 
 class MacroGetName(Macro):
-        def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]) -> bool:
-                vn = 'VISITS'
-                r = re.compile(r"(\b\w+\b)\s*$")
-                m = r.search(ngrams.text())
-                if m is None:
-                    return False
-                name = m.group()
-                if 'NAME' in vars and vars['NAME'] == name:
-                    vars[vn] += 1
-                    return True
-                vars['NAME'] = name
-                vars[vn] = 1
+    def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]):
+        vn = 'VISITS'
+        r = re.compile(
+            r"(?i)(.* call me|call me|.* it\'s|it\'s|.* i\'m|i\'m|.* i am|i am|.* this is|this is|.* it is|it is|this\'s|.* this\'s|my name is|.* my name is)?(?:\s)*([A-z']{2,12})(?:\s([A-z']{2,12}))?")
+        m = r.search(ngrams.text())
+        if m is None: return False
+        intro, firstname, lastname = None, None, None
+        if m.group(2):
+            firstname = m.group(2)
+            lastname = m.group(3)
+        if m.group(1):
+            intro = m.group(1)
+
+        fn = 'FIRSTNAME'
+        # if the first name is not in the dictionary, then add it to the dictionary
+        if fn not in vars:
+            vars[fn] = firstname
+            vars['RETURN'] = 0
+        else:  # else if the first name is in the dictionary, then check if the first name is the same as the one in the dictionary
+            if vars[fn] == firstname:
+                vars['RETURN'] = 1
+            else:
+                vars[fn] = firstname
+                vars['RETURN'] = 0
+        return True
+
+class MacroRemember(Macro):
+    def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]):
+        if 'RETURN' in vars:
+            if vars['RETURN'] == 1:
+                return True
+            else:
                 return False
+
+        return False
+
 
 class MacroWeather(Macro):
     def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]):
@@ -58,7 +81,8 @@ class MacroWeather(Macro):
         d = json.loads(r.text)
         periods = d['properties']['periods']
         today = periods[0]
-        return today['detailedForecast']
+        #match certain keywords in the forecast (sunny, cloudy, etc.), and return that weather keyword
+        return today['shortForecast'].lower()
 
 
 class MacroVisits(Macro):
@@ -92,22 +116,48 @@ class MacroWhatElse(Macro):
 def quiz4() -> DialogueFlow:
     transitions = {
         'state': 'start',
-        '`Hi. what can I do for you today?`': {
-            '[{song,movie,recommendation}]': {
-                '`Sure. What should I call you?`': {
+        '`Hi. `#TIME`and`#WEATHER`.what can I do for you today?`': {
+            '[{song,movie,film,music,recommendation}]': {
+                '#GATE`Sure. What should I call you?`': {
                     '#GETNAME': {
-                        '`It\'s nice to meet you,`#GETNAME`.What do you want to know about today?`': {
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you watched ` $MOVIE_CHOSEN `that I recommended last time?` #SET($MOVIE_RETURN=False)': {
+                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
+                                '`Wonderful! What do you want me to recommend this time?`':{
+                                    '[{#LEM(movie),#LEM(film)}]': 'movie',
+                                    '[{#LEM(music),#LEM(song)}]': 'music',
+                                    'error': {
+                                        'state': 'goodbye',
+                                        '`Goodbye!`': 'end'
+                                    }
+                                }
+                            },
 
-                            '[movie]': 'movie',
-                            '[music]': 'music',
                             'error': {
                                 'state': 'goodbye',
                                 '`Goodbye!`': 'end'
                             }
                         },
-                        '`Welcome back, `#GETNAME`,What do you want to know about today?`':{
-                            '[movie]': 'movie',
-                            '[music]': 'music',
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {
+                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
+                                '`Wonderful! What do you want me to recommend this time?`':{
+                                    '[{#LEM(movie),#LEM(film)}]': 'movie',
+                                    '[{#LEM(music),#LEM(song)}]': 'music',
+                                    'error': {
+                                        'state': 'goodbye',
+                                        '`Goodbye!`': 'end'
+                                    }
+                                }
+                            },
+
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        },
+                        '`It\'s nice to meet you,`$FIRSTNAME`.What do you want to know about today?`': {
+
+                            '[{#LEM(movie),#LEM(film)}]': 'movie',
+                            '[{#LEM(music),#LEM(song)}]': 'music',
                             'error': {
                                 'state': 'goodbye',
                                 '`Goodbye!`': 'end'
@@ -117,7 +167,102 @@ def quiz4() -> DialogueFlow:
                     'error': {
                         'Sorry, I cannot understand you': 'start'
                     }},
+                '#GATE`Alright. May I have your name?`': {
+                    '#GETNAME': {
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you watched ` $MOVIE_CHOSEN `that I recommended last time?` #SET($MOVIE_RETURN=False)': {
+                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
+                                '`Wonderful! What do you want me to recommend this time?`':{
+                                    '[{#LEM(movie),#LEM(film)}]': 'movie',
+                                    '[{#LEM(music),#LEM(song)}]': 'music',
+                                    'error': {
+                                        'state': 'goodbye',
+                                        '`Goodbye!`': 'end'
+                                    }
+                                }
+                            },
 
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        },
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
+                                '`Wonderful! What do you want me to recommend this time?`': {
+                                    '[{#LEM(movie),#LEM(film)}]': 'movie',
+                                    '[{#LEM(music),#LEM(song)}]': 'music',
+                                    'error': {
+                                        'state': 'goodbye',
+                                        '`Goodbye!`': 'end'
+                                    }
+                                }
+                            },
+
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        },
+                        '`It\'s nice to meet you,`$FIRSTNAME`.What do you want to know about today?`': {
+
+                            '[{#LEM(movie),#LEM(film)}]': 'movie',
+                            '[{#LEM(music),#LEM(song)}]': 'music',
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        }
+                    },
+                    'error': {
+                        'Sorry, I cannot understand you': 'start'
+                    }},
+                '#GATE`Of course. Could you tell me your name?`': {
+                    '#GETNAME': {
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you watched ` $MOVIE_CHOSEN `that I recommended last time?` #SET($MOVIE_RETURN=False)': {
+                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
+                                '`Wonderful! What do you want me to recommend this time?`':{
+                                    '[{#LEM(movie),#LEM(film)}]': 'movie',
+                                    '[{#LEM(music),#LEM(song)}]': 'music',
+                                    'error': {
+                                        'state': 'goodbye',
+                                        '`Goodbye!`': 'end'
+                                    }
+                                }
+                            },
+
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        },
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
+                                '`Wonderful! What do you want me to recommend this time?`': {
+                                    '[{#LEM(movie),#LEM(film)}]': 'movie',
+                                    '[{#LEM(music),#LEM(song)}]': 'music',
+                                    'error': {
+                                        'state': 'goodbye',
+                                        '`Goodbye!`': 'end'
+                                    }
+                                }
+                            },
+
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        },
+                        '`It\'s nice to meet you,`$FIRSTNAME`.What do you want to know about today?`': {
+
+                            '[{#LEM(movie),#LEM(film)}]': 'movie',
+                            '[{#LEM(music),#LEM(song)}]': 'music',
+                            'error': {
+                                'state': 'goodbye',
+                                '`Goodbye!`': 'end'
+                            }
+                        }
+                    },
+                    'error': {
+                        'Sorry, I cannot understand you': 'start'
+                    }},
                 'error': {
                     'Sorry, I cannot understand you': 'start'
                 }
@@ -140,13 +285,13 @@ def quiz4() -> DialogueFlow:
         '`How about "Raining Tacos"? It\'s a really nice song.` #SET($SONG_CHOSEN=Raining Tacos)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Sure! Enjoy your song!`': 'end'
+                '`Sure! Enjoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?plot|more information|more info|know more|detail|details)/]': {
                 '`It\'s a fun children\'s song by Parry Gripp`': {
                     'state': 'ifListen',
                     '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                        '`Great! Enjoy your song!`': 'end'
+                        '`Great! Enjoy your song!`#SET($SONG_RETURN=True)': 'end'
                     },
                     '[/(?i)(no|nope|not|nah|already seen|have seen|not interesting|lame|won\'t|don\'t|wouldn\'t)/]': 'other_recommend_song',
                     '#UNX': {
@@ -166,13 +311,13 @@ def quiz4() -> DialogueFlow:
         '`How about "Spider-Man: Homecoming"? It\'s my personal favorite.` #SET($MOVIE_CHOSEN=Spider-Man: Homecoming)': {
             '[/(?i)(no|nope|not|nah|already seen|have seen|seen|do not|don\'t like|do not like)/]': 'other_recommend_movie',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
-                '`Sure! Enjoy your movie!`': 'end'
+                '`Sure! Enjoy your movie!`#SET($MOVIE_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?plot|more information|more info|know more|detail|details)/]': {
                 '`It\'s a superhero movie about a teenager who is trying to balance his life as a high school student and as a superhero.`': {
                     'state': 'ifWatch',
                     '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
-                        '`Perfect! Enjoy your movie!`'
+                        '`Perfect! Enjoy your movie!`#SET($MOVIE_RETURN=True)':'end'
                     },
                     '[/(?i)(no|nope|not|nah|already seen|have seen|not interesting|lame|won\'t|don\'t)/]': 'other_recommend_movie',
                     '#UNX': {
@@ -188,10 +333,10 @@ def quiz4() -> DialogueFlow:
     }
     other_recommendation_movie_transitions = {
         'state': 'other_recommend_movie',
-        '#GATE `Well. How about "Titanic"? It\'s fantastic.` #SET($SONG_CHOSEN=Titanic)': {
+        '#GATE `Well. How about "Titanic"? It\'s fantastic.` #SET($MOVIE_CHOSEN=Titanic)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_movie',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Sure! Enjoy your movie!`': 'end'
+                '`Sure! Enjoy your movie!`#SET($MOVIE_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous romance movie narrating the sotry of a young couple `': 'ifWatch'
@@ -200,10 +345,10 @@ def quiz4() -> DialogueFlow:
                 '`I am sorry, I don\'t understand.`': 'movie'
             }
         },
-        '#GATE `Well. How about "Annabelle"? It\'s amazing.` #SET($SONG_CHOSEN=Annabelle)': {
+        '#GATE `Well. How about "Annabelle"? It\'s amazing.` #SET($MOVIE_CHOSEN=Annabelle)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_movie',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Sure! Enjoy your movie!`': 'end'
+                '`Sure! Enjoy your movie!`#SET($MOVIE_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous horror movie talking about the supernatural evil occurence in the form of a doll `': 'ifWatch'
@@ -212,10 +357,10 @@ def quiz4() -> DialogueFlow:
                 '`I am sorry, I don\'t understand.`': 'movie'
             }
         },
-        '#GATE `Well. How about "Creed"? It\'s amazing.` #SET($SONG_CHOSEN=Creed)': {
+        '#GATE `Well. How about "Creed"? It\'s amazing.` #SET($MOVIE_CHOSEN=Creed)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_movie',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Sure! Enjoy your movie!`': 'end'
+                '`Sure! Enjoy your movie!`#SET($MOVIE_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous action movie narrating an inspirational story of the world boxing champion  `': 'ifWatch'
@@ -238,7 +383,7 @@ def quiz4() -> DialogueFlow:
         '#GATE `Well. How about "Love Story"?.` #SET($SONG_CHOSEN=Love Story)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Great! Enojoy your song!`': 'end'
+                '`Great! Enojoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous lyric song by Taylor Swifts that tells a classic story of young love overcoming obstacles `': 'ifListen'
@@ -250,7 +395,7 @@ def quiz4() -> DialogueFlow:
         '#GATE `Well. How about "21 Guns"?.` #SET($SONG_CHOSEN=21 Guns)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Great! Enojoy your song!`': 'end'
+                '`Great! Enojoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous rock song by Green Day that express a longing for change and a desire to escape from the difficulties of life. `': 'ifListen'
@@ -262,7 +407,7 @@ def quiz4() -> DialogueFlow:
         '#GATE `Well. How about "The Next Episode"?.` #SET($SONG_CHOSEN=The Next Episode)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Great! Enojoy your song!`': 'end'
+                '`Great! Enojoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a popular rap song by Eminem that is an anecdote describing his transition from living in a trailer park to becoming a rap superstar. `': 'ifListen'
@@ -286,7 +431,8 @@ def quiz4() -> DialogueFlow:
         'WEATHER': MacroWeather(),
         'VISITS': MacroVisits(),
         'GETNAME': MacroGetName(),
-        'WHATELSE': MacroWhatElse()
+        'WHATELSE': MacroWhatElse(),
+        'VISITED': MacroRemember()
     }
 
     df = DialogueFlow('start', end_state='end')

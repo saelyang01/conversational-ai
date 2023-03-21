@@ -117,50 +117,48 @@ def quiz4() -> DialogueFlow:
     transitions = {
         'state': 'start',
         '`Hi. `#TIME`and`#WEATHER`.what can I do for you today?`': {
+            'state': 'introduce',
             '[{song,movie,film,music,recommendation}]': {
+
                 '#GATE`Sure. What should I call you?`': {
                     '#GETNAME': {
                         '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you watched ` $MOVIE_CHOSEN `that I recommended last time?` #SET($MOVIE_RETURN=False)': {
                             '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
-                                '`Wonderful! What do you want me to recommend this time?`':{
+                                '`Wonderful! What else do you want me to recommend this time?`':{
+                                    'state':'recommend',
                                     '[{#LEM(movie),#LEM(film)}]': 'movie',
                                     '[{#LEM(music),#LEM(song)}]': 'music',
                                     'error': {
-                                        'state': 'goodbye',
-                                        '`Goodbye!`': 'end'
+                                        '`Sorry, I don\'t provide such service`': 'end'
                                     }
                                 }
                             },
 
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`Fine! Do you want other recommendations?`':'recommend'
                             }
                         },
                         '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {
                             '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
-                                '`Wonderful! What do you want me to recommend this time?`':{
+                                '`Wonderful! What else do you want me to recommend this time?`':{
+                                    'state':'recommend',
                                     '[{#LEM(movie),#LEM(film)}]': 'movie',
                                     '[{#LEM(music),#LEM(song)}]': 'music',
                                     'error': {
-                                        'state': 'goodbye',
-                                        '`Goodbye!`': 'end'
+                                        '`Sorry, I don\'t provide such service`': 'end'
                                     }
                                 }
                             },
 
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`OK! Do you have any other preferences?`':'recommend'
                             }
                         },
                         '`It\'s nice to meet you,`$FIRSTNAME`.What do you want to know about today?`': {
-
                             '[{#LEM(movie),#LEM(film)}]': 'movie',
                             '[{#LEM(music),#LEM(song)}]': 'music',
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`Sorry, I don\'t provide such service`': 'end'
                             }
                         }
                     },
@@ -171,35 +169,34 @@ def quiz4() -> DialogueFlow:
                     '#GETNAME': {
                         '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you watched ` $MOVIE_CHOSEN `that I recommended last time?` #SET($MOVIE_RETURN=False)': {
                             '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
-                                '`Wonderful! What do you want me to recommend this time?`':{
+                                '`Wonderful! What else do you want me to recommend this time?`':{
+
                                     '[{#LEM(movie),#LEM(film)}]': 'movie',
                                     '[{#LEM(music),#LEM(song)}]': 'music',
                                     'error': {
-                                        'state': 'goodbye',
-                                        '`Goodbye!`': 'end'
+                                        '`Sorry, I don\'t provide such service`': 'end'
                                     }
                                 }
                             },
 
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                               '`OK! Are you interested in other recommendations?`':'recommend'
                             }
                         },
-                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
-                                '`Wonderful! What do you want me to recommend this time?`': {
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {
+                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
+                                '`Wonderful! What else do you want me to recommend this time?`': {
+
                                     '[{#LEM(movie),#LEM(film)}]': 'movie',
                                     '[{#LEM(music),#LEM(song)}]': 'music',
                                     'error': {
-                                        'state': 'goodbye',
-                                        '`Goodbye!`': 'end'
+                                        '`Sorry, I don\'t provide such service`': 'end'
                                     }
                                 }
                             },
 
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`That\'s fine. Any other preferences?`':'recommend'
                             }
                         },
                         '`It\'s nice to meet you,`$FIRSTNAME`.What do you want to know about today?`': {
@@ -207,8 +204,7 @@ def quiz4() -> DialogueFlow:
                             '[{#LEM(movie),#LEM(film)}]': 'movie',
                             '[{#LEM(music),#LEM(song)}]': 'music',
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`Sorry, I don\'t provide such service`': 'end'
                             }
                         }
                     },
@@ -219,35 +215,32 @@ def quiz4() -> DialogueFlow:
                     '#GETNAME': {
                         '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you watched ` $MOVIE_CHOSEN `that I recommended last time?` #SET($MOVIE_RETURN=False)': {
                             '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]':{
-                                '`Wonderful! What do you want me to recommend this time?`':{
+                                '`Wonderful! What else do you want me to recommend this time?`':{
                                     '[{#LEM(movie),#LEM(film)}]': 'movie',
                                     '[{#LEM(music),#LEM(song)}]': 'music',
                                     'error': {
-                                        'state': 'goodbye',
-                                        '`Goodbye!`': 'end'
+                                        '`Sorry, I don\'t provide such service`': 'end'
                                     }
                                 }
                             },
 
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`I get it. Anything interest?`':'recommend'
                             }
                         },
-                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
-                                '`Wonderful! What do you want me to recommend this time?`': {
+                        '#IF(#VISITED) `Welcome back, `$FIRSTNAME`,Have you get to listened to ` $SONG_CHOSEN `that I recommended last time?` #SET($SONG_RETURN=False)': {
+                            '[/(?i)(yes|yea|definitely|of course|yep|sure|will watch|i\'ll|try|interesting|ok|okay)/]': {
+                                '`Wonderful! What else do you want me to recommend this time?`': {
                                     '[{#LEM(movie),#LEM(film)}]': 'movie',
                                     '[{#LEM(music),#LEM(song)}]': 'music',
                                     'error': {
-                                        'state': 'goodbye',
-                                        '`Goodbye!`': 'end'
+                                        '`Sorry, I don\'t provide such service`': 'end'
                                     }
                                 }
                             },
 
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                               '`Come on. What other things do you enjoy?`':'recommend'
                             }
                         },
                         '`It\'s nice to meet you,`$FIRSTNAME`.What do you want to know about today?`': {
@@ -255,8 +248,7 @@ def quiz4() -> DialogueFlow:
                             '[{#LEM(movie),#LEM(film)}]': 'movie',
                             '[{#LEM(music),#LEM(song)}]': 'music',
                             'error': {
-                                'state': 'goodbye',
-                                '`Goodbye!`': 'end'
+                                '`Sorry, I don\'t provide such service`': 'end'
                             }
                         }
                     },
@@ -267,16 +259,8 @@ def quiz4() -> DialogueFlow:
                     'Sorry, I cannot understand you': 'start'
                 }
             },
-
-            '[{weather, forecast}]': {
-                'state': 'weather',
-                '#WEATHER': 'start'
-            },
-            '[{time, clock}]': {
-                'state': 'time',
-                '#TIME': 'start'
-            },
-            'error': 'goodbye'
+            'error': {'`Sorry, I don\'t provide such service. Are you interested in movie or music?`':'introduce'
+                      }
         }
     }
 
@@ -339,7 +323,7 @@ def quiz4() -> DialogueFlow:
                 '`Sure! Enjoy your movie!`#SET($MOVIE_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
-                '`It\'s a famous romance movie narrating the sotry of a young couple `': 'ifWatch'
+                '`It\'s a famous romance movie narrating the story of a young couple `': 'ifWatch'
             },
             'error': {
                 '`I am sorry, I don\'t understand.`': 'movie'
@@ -351,7 +335,7 @@ def quiz4() -> DialogueFlow:
                 '`Sure! Enjoy your movie!`#SET($MOVIE_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
-                '`It\'s a famous horror movie talking about the supernatural evil occurence in the form of a doll `': 'ifWatch'
+                '`It\'s a famous horror movie talking about the supernatural evil occurrence in the form of a doll `': 'ifWatch'
             },
             'error': {
                 '`I am sorry, I don\'t understand.`': 'movie'
@@ -383,7 +367,7 @@ def quiz4() -> DialogueFlow:
         '#GATE `Well. How about "Love Story"?.` #SET($SONG_CHOSEN=Love Story)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Great! Enojoy your song!`#SET($SONG_RETURN=True)': 'end'
+                '`Great! Enjoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous lyric song by Taylor Swifts that tells a classic story of young love overcoming obstacles `': 'ifListen'
@@ -395,7 +379,7 @@ def quiz4() -> DialogueFlow:
         '#GATE `Well. How about "21 Guns"?.` #SET($SONG_CHOSEN=21 Guns)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Great! Enojoy your song!`#SET($SONG_RETURN=True)': 'end'
+                '`Great! Enjoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a famous rock song by Green Day that express a longing for change and a desire to escape from the difficulties of life. `': 'ifListen'
@@ -407,7 +391,7 @@ def quiz4() -> DialogueFlow:
         '#GATE `Well. How about "The Next Episode"?.` #SET($SONG_CHOSEN=The Next Episode)': {
             '[/(?i)(no|nope|not|nah|already|known|listened|knew|do not|don\'t like|do not like|won\'t|wouldn\'t)/]': 'other_recommend_song',
             '[/(?i)(why not|yes|yea|definitely|of course|yep|sure|will listen|i\'ll|try|interesting|ok|okay)/]': {
-                '`Great! Enojoy your song!`#SET($SONG_RETURN=True)': 'end'
+                '`Great! Enjoy your song!`#SET($SONG_RETURN=True)': 'end'
             },
             '[/(?i)(what.*?about|what.*?story|what.*?background|more information|more info|know more|detail|details)/]': {
                 '`It\'s a popular rap song by Eminem that is an anecdote describing his transition from living in a trailer park to becoming a rap superstar. `': 'ifListen'

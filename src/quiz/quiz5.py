@@ -42,8 +42,8 @@ class MacroCheck(Macro):
 class MacroHaircut(Macro):
     def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]):
         model = 'gpt-3.5-turbo'
-        content = ' Based on the input statement, return \'True\'if the if the user is making appointment on Monday 10am, 1pm, 2om' \
-                  'otherwise return \'False\'. return only True or false(only return the uppercase letter codes):'
+        content = ' Based on the input statement, return \'True\'if the if the user is making appointment on  Monday 10 AM or ' \
+                  'Monday 1 PM or Monday 2 PM or Tuesday 2PM. Otherwise return \'False\'. return only True or false(only return the uppercase letter codes):'
         content = content + ngrams.raw_text()
         response = openai.ChatCompletion.create(
             model=model,
@@ -64,8 +64,8 @@ class MacroHaircolor(Macro):
     def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]):
         model = 'gpt-3.5-turbo'
         content = 'Based on the input statement, return \'True\' if the user is making appointment   ' \
-                  'on Wednesday 10 AM, 11 AM and 1 PM and Thursday 10 AM and 11 AM. Otherwise return \'False\'. ' \
-                  'return only True or false(only return the uppercase letter codes):'
+                  'on  Wednesday 10 AM or Wednesday 11 AM or Wednesday 1 PM or Thursday 10 AM or Thursday 11 AM.  ' \
+                  'Otherwise return \'False\'. return only True or false(only return the uppercase letter codes):'
         content = content + ngrams.raw_text()
         response = openai.ChatCompletion.create(
             model=model,
@@ -86,8 +86,8 @@ class MacroHaircolor(Macro):
 class MacroHairperm(Macro):
     def run(self, ngrams: Ngrams, vars: Dict[str, Any], args: List[Any]):
         model = 'gpt-3.5-turbo'
-        content = ' Based on the input statement, return \'True\' if the user is making appointment on Friday 10 AM, 11AM, ' \
-                  '1 PM, 2 PM and Saturday 10 AM, and 2 PM. Otherwise return \'False\''\
+        content = ' Based on the input statement, return \'True\' if the user is making appointment on  Friday 10 AM or ' \
+                  'Friday 11 AM or Friday 1 PM or Friday 2 PM or Saturday 10 AM or Satueday 2 PM. Otherwise return \'False\''\
                   'return only True or false(only return the uppercase letter codes):'
 
         content = content + ngrams.raw_text()
